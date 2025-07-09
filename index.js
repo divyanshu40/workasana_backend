@@ -5,6 +5,8 @@ const { project } = require("./models/project.model");
 const { task } = require("./models/task.model");
 const { team } = require("./models/team.model");
 const { user } = require("./models/user.model");
+const { signup, login } = require("./controllers/authHandler");
+const { authenticateToken } = require("./middleware/auth");
 
 const app = express();
 const PORT = 3000;
@@ -35,6 +37,19 @@ async function getAllProjects() {
     return { projects };
 }
 
+// function to get user details
+async function getUserDetails(userId) {
+    let userData = await user.findById(userId).populate("projects").populate("tasks");
+    if (! userData) {
+        return null;
+    }
+    return { userData };
+}
+
+// Routes for authentication
+app.post("/signup", signup);
+app.post("/login", login);
+
 // POST Route to add project
 app.post("/projects/new", async (req, res) => {
     let data = req.body;
@@ -52,6 +67,20 @@ app.get("/projects", async (req, res) => {
         let response = await getAllProjects();
         if (response.projects.length === 0) {
             return res.status(404).json({ message: "No projects found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET route to get user details
+app.get("/user/details", authenticateToken, async (req, res) => {
+    let userId = req.user.id;
+    try {
+        let response = await getUserDetails(userId);
+        if (response === null) {
+            return res.status(404).json({ message: "User not found" });
         }
         return res.status(200).json(response);
     } catch(error) {
