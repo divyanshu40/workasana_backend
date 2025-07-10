@@ -12,7 +12,7 @@ const authenticateToken = async (req, res, next) => {
    try {
      jwt.verify(token, JWT_SECRET_KEY, (err, user) => {
         if (err) {
-            res.status(403).json({ message: "Token expired" });
+           return res.status(403).json({ message: "Token expired" });
         }
         req.user = user;
         next();
