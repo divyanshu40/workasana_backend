@@ -24,10 +24,10 @@ initializeDatabase().then(() => {
 async function addProjects(data) {
     if (typeof(data) === "object" && Array.isArray(data)) {
         let projects = await project.insertMany(data);
-        return { projects };
+        return projects ;
     } else if (typeof(data) === "object" && !Array.isArray(data)) {
         let projectDetails = await new project(data).save();
-        return { projectDetails }
+        return projectDetails 
     }
 }
 
