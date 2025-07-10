@@ -58,7 +58,7 @@ app.post("/signup", signup);
 app.post("/login", login);
 
 // POST Route to add project
-app.post("/projects/new", async (req, res) => {
+app.post("/projects/new", authenticateToken, async (req, res) => {
     let data = req.body;
     try {
         let response = await addProjects(data);
