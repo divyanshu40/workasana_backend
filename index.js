@@ -32,9 +32,10 @@ async function addProjects(data) {
 }
 
 // function to get projects
-async function getAllProjects() {
-    let projects = await project.find();
-    return { projects };
+async function getAllProjects(userId) {
+    let userDetails = await user.findById(userId);
+    let projects = await project.find({ _id: { $in: userDetails.projects.map(ele => ele._id)}});
+    return projects;
 }
 
 // function to get user details
@@ -44,6 +45,12 @@ async function getUserDetails(userId) {
         return null;
     }
     return { userData };
+}
+
+// function to fetch tasks
+async function getAllTasks(userId) {
+    let tasks = await task.find({ owners: userId });
+    return tasks;
 }
 
 // Routes for authentication
@@ -63,9 +70,10 @@ app.post("/projects/new", async (req, res) => {
 
 // GET Route to fetch all projects
 app.get("/projects", async (req, res) => {
+    let userId = req.user.id;
     try {
-        let response = await getAllProjects();
-        if (response.projects.length === 0) {
+        let response = await getAllProjects(userId);
+        if (response.length === 0) {
             return res.status(404).json({ message: "No projects found" });
         }
         return res.status(200).json(response);
@@ -85,5 +93,19 @@ app.get("/user/details", authenticateToken, async (req, res) => {
         return res.status(200).json(response);
     } catch(error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// GET route to get all tasks of a user
+app.get("/tasks", authenticateToken, async (req, res) => {
+    let userId = req.user.id;
+    try {
+        let response = await getAllTasks(userId);
+        if (response.length === 0) {
+            res.status(404).json({ message: "No tasks found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message});
     }
 });
