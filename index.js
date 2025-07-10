@@ -44,7 +44,7 @@ async function getUserDetails(userId) {
     if (! userData) {
         return null;
     }
-    return { userData };
+    return userData ;
 }
 
 // function to fetch tasks
