@@ -69,7 +69,7 @@ app.post("/projects/new", async (req, res) => {
 }); 
 
 // GET Route to fetch all projects
-app.get("/projects", async (req, res) => {
+app.get("/projects", authenticateToken, async (req, res) => {
     let userId = req.user.id;
     try {
         let response = await getAllProjects(userId);
