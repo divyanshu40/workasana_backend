@@ -34,7 +34,7 @@ async function addProjects(data) {
 // function to get projects
 async function getAllProjects(userId) {
     let userDetails = await user.findById(userId);
-    let projects = await project.find({ _id: { $in: userDetails.projects.map(ele => ele._id)}});
+    let projects = await project.find({ _id: { $in: userDetails.projects.map(ele => ele._id)}}).populate("tasks");
     return projects;
 }
 
