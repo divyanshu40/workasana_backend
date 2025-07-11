@@ -53,6 +53,14 @@ async function getAllTasks(userId) {
     return tasks;
 }
 
+// function to add teams
+async function addNewTeam(teamData) {
+    let teamMembers = await user.find({ email: { $in: teamData.members }});
+    let teamMemberIds = teamMembers.map(obj => obj._id);
+    let addedTeam = await new team({...teamData, members: teamMemberIds }).save();
+    return addedTeam;
+}
+
 // Routes for authentication
 app.post("/signup", signup);
 app.post("/login", login);
@@ -66,7 +74,18 @@ app.post("/projects/new", authenticateToken, async (req, res) => {
     } catch(error) {
         res.status(500).json({ error: error.message});
     }
-}); 
+});
+
+// POST Route to add new team
+app.post("/team/new", authenticateToken, async (req, res) => {
+    let teamData = req.body;
+    try {
+        let response = await addNewTeam(teamData);
+        return res.status(201).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // GET Route to fetch all projects
 app.get("/projects", authenticateToken, async (req, res) => {
