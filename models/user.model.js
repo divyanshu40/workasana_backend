@@ -33,6 +33,12 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "task"
         }
+    ],
+    teams: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "team"
+        }
     ]
 }, {
     timestamps: true
