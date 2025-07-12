@@ -60,6 +60,14 @@ async function addNewTeam(teamData) {
     let addedTeam = await new team({...teamData, members: teamMemberIds }).save();
     return addedTeam;
 }
+// function to update user details
+async function updateUserDetails(userId, updatedData) {
+    let updatedUserDetails = await user.findByIdAndUpdate(userId, updatedData, { new: true });
+    if (! updatedUserDetails) {
+        return null;
+    }
+    return updatedUserDetails;
+}
 
 // Routes for authentication
 app.post("/signup", signup);
@@ -82,6 +90,21 @@ app.post("/team/new", authenticateToken, async (req, res) => {
     try {
         let response = await addNewTeam(teamData);
         return res.status(201).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST Route to update user details
+app.post("/user/details/update", authenticateToken, async (req, res) => {
+    let userId = req.user.id;
+    let updatedData = req.body;
+    try {
+        let response = await updateUserDetails(userId, updatedData);
+        if (response === null) {
+            return res.status(404).json({ message: "User not found"});
+        }
+        return res.status(200).json(response);
     } catch(error) {
         res.status(500).json({ error: error.message });
     }
@@ -128,3 +151,4 @@ app.get("/tasks", authenticateToken, async (req, res) => {
         res.status(500).json({ error: error.message});
     }
 });
+
