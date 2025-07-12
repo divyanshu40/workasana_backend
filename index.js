@@ -62,7 +62,7 @@ async function addNewTeam(teamData) {
 }
 // function to update user details
 async function updateUserDetails(userId, updatedData) {
-    let updatedUserDetails = await user.findByIdAndUpdate(userId, updatedData, { new: true });
+    let updatedUserDetails = await user.findByIdAndUpdate(userId, updatedData, { new: true }).populate("tasks").populate("projects").populate("teams");
     if (! updatedUserDetails) {
         return null;
     }
