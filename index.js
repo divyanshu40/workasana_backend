@@ -69,6 +69,12 @@ async function updateUserDetails(userId, updatedData) {
     return updatedUserDetails;
 }
 
+// function to get users on the basis of some data
+async function getUsersByData(data) {
+    let users = await user.find(data);
+    return users;
+}
+
 // Routes for authentication
 app.post("/signup", signup);
 app.post("/login", login);
@@ -152,3 +158,16 @@ app.get("/tasks", authenticateToken, async (req, res) => {
     }
 });
 
+// GET route to get users on the basis of some data
+app.get("/users/details", authenticateToken, async (req, res) => {
+    let data = req.body;
+    try {
+        let response = await getUsersByData(data);
+        if (response.length === 0) {
+           return res.status(404).json({ message: "No users found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
