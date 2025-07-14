@@ -71,8 +71,68 @@ async function updateUserDetails(userId, updatedData) {
 
 // function to get users on the basis of some data
 async function getUsersByData(data) {
-    let users = await user.find(data);
+    let users = await user.find(data).populate("projects").populate("tasks").populate("teams");
     return users;
+}
+
+// function to get team details by id
+async function getTeamDetailsById(teamId) {
+    let teamDetails = await team.findById(teamId).populate("members");
+    if (! teamDetails) {
+        return null;
+    }
+    return teamDetails;
+}
+
+// function to get project details by id
+async function getProjectDetailsById(projectId) {
+    let projectDetails = await project.findById(projectId).populate("tasks");
+    if (! projectId) {
+        return null;
+    }
+    return projectDetails;
+}
+
+// function to get task details by id
+async function getTaskDetailsById(taskId) {
+    let taskDetails = await task.findById(taskId).populate("project").populate("team").populate("owners");
+    if (! taskDetails) {
+        return null;
+    }
+    return taskDetails;
+}
+
+// function to update project details
+async function updateProjectDetails(projectId, updatedData) {
+    let updatedProject = await project.findByIdAndUpdate(projectId, updatedData, { new: true }).populate("tasks");
+    if (! updatedProject) {
+        return null;
+    }
+    return updatedProject
+}
+
+// function to updated team details
+async function updateTeamDetails(teamId, updatedData) {
+    let updatedTeam = await team.findByIdAndUpdate(teamId, updatedData, { new: true }).populate("members");
+    if ( ! updatedTeam) {
+        return null;
+    }
+    return updatedTeam;
+}
+
+// function to update task details
+async function updateTaskDetails(taskId, updatedData) {
+    let updatedTask = await task.findByIdAndUpdate(taskId, updatedData, { new: true }).populate("project").populate("team").populate("owners");
+    if (! updatedTask) {
+        return null;
+    }
+    return updatedTask;
+}
+
+// function to add task
+async function addNewTask(taskData) {
+    let addedTask = (await (await new task(taskData).save()).populate("project")).populate("team").populate("owners");
+    return addedTask;
 }
 
 // Routes for authentication
@@ -111,6 +171,62 @@ app.post("/user/details/update", authenticateToken, async (req, res) => {
             return res.status(404).json({ message: "User not found"});
         }
         return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST route update project details
+app.post("/project/update/:id", authenticateToken, async (req, res) => {
+    let projectId = req.params.id;
+    let updatedData = req.body;
+    try {
+        let response = await updateProjectDetails(projectId, updatedData);
+        if (response === null) {
+            return res.status(404).json({ message: "Project not found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST route update team details
+app.post("/team/update/:id", authenticateToken, async (req, res) => {
+    let teamId = req.params.id;
+    let updatedData = req.body;
+    try {
+        let response = await updateTeamDetails(teamId, updatedData);
+        if (response === null) {
+            return res.status(404).json({ message: "Team not found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST route to update task details
+app.post("/task/update/:id", authenticateToken, async (req, res) => {
+    let taskId = req.params.id;
+    let updatedData = req.body;
+    try {
+        let response = await updateTaskDetails(taskId, updatedData);
+        if (response === null) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST route add new task
+app.post("/task/new", authenticateToken, async (req, res) => {
+    let taskData = req.body;
+    try {
+        let response = await addNewTask(taskData);
+        return res.status(201).json(response);
     } catch(error) {
         res.status(500).json({ error: error.message });
     }
@@ -165,6 +281,48 @@ app.get("/users/details", authenticateToken, async (req, res) => {
         let response = await getUsersByData(data);
         if (response.length === 0) {
            return res.status(404).json({ message: "No users found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET route to get team details by id
+app.get("/team/details/:id", authenticateToken, async (req, res) => {
+    let teamId = req.params.id;
+    try {
+        let response = await getTeamDetailsById(teamId);
+        if (response === null) {
+            return res.status(404).json({ message: "Team not found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET route to get project details by id
+app.get("/project/details/:id", authenticateToken, async (req, res) => {
+    let projectId = req.params.id;
+    try {
+        let response = await getProjectDetailsById(projectId);
+        if (response === null) {
+            return res.status(404).json({ message: "Project not found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET Route to task details by id
+app.get("/task/details/:id", authenticateToken, async (req, res) => {
+    let taskId = req.params.id;
+    try {
+        let response = await getTaskDetailsById(taskId);
+        if (response === null) {
+            return res.status(404).json({ message: "Task not found" });
         }
         return res.status(200).json(response);
     } catch(error) {
