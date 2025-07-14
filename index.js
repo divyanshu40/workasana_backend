@@ -40,7 +40,7 @@ async function getAllProjects(userId) {
 
 // function to get user details
 async function getUserDetails(userId) {
-    let userData = await user.findById(userId).populate("projects").populate("tasks");
+    let userData = await user.findById(userId).populate("projects").populate("tasks").populate("teams");
     if (! userData) {
         return null;
     }
