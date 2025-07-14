@@ -49,7 +49,7 @@ async function getUserDetails(userId) {
 
 // function to fetch tasks
 async function getAllTasks(userId) {
-    let tasks = await task.find({ owners: userId });
+    let tasks = await task.find({ owners: userId }).populate("project").populate("team").populate("owners");
     return tasks;
 }
 
@@ -131,7 +131,7 @@ async function updateTaskDetails(taskId, updatedData) {
 
 // function to add task
 async function addNewTask(taskData) {
-    let addedTask = (await (await new task(taskData).save()).populate("project")).populate("team").populate("owners");
+    let addedTask = await new task(taskData).save();
     return addedTask;
 }
 
