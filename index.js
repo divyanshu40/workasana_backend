@@ -279,7 +279,7 @@ app.post("/user/update/:id", authenticateToken, async (req, res) => {
     let userId = req.params.id;
     let updatedData = req.body;
     try {
-        let response = await getUserDetailsById(userId, updatedData);
+        let response = await updateUserDetailsById(userId, updatedData);
         if (response === null) {
             return res.status(404).json({ message: "User not found" });
         }
