@@ -275,7 +275,7 @@ app.post("/user/update/details",authenticateToken, async (req, res) => {
 });
 
 // POST route to update user details by user id
-app.post("/user/updated/:id", authenticateToken, async (req, res) => {
+app.post("/user/update/:id", authenticateToken, async (req, res) => {
     let userId = req.params.id;
     let updatedData = req.body;
     try {
