@@ -186,6 +186,12 @@ async function deleteMultipleTasks(data) {
     return response;
 }
 
+// function to update multiple users
+async function updateMultipleUsers(filter, update) {
+    let response = await user.updateMany(filter, update);
+    return response;
+}
+
 // Routes for authentication
 app.post("/signup", signup);
 app.post("/login", login);
@@ -318,6 +324,18 @@ app.post("/tasks/delete/many", authenticateToken, async (req, res) => {
     let data = req.body;
     try {
         let response = await deleteMultipleTasks(data);
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST route to delete mulltiple users
+app.post("/users/update/many", authenticateToken, async (req, res) => {
+    let filter = req.body.filter;
+    let update = req.body.update;
+    try {
+        let response = await updateMultipleUsers(filter, update);
         return res.status(200).json(response);
     } catch(error) {
         res.status(500).json({ error: error.message });
