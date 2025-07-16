@@ -162,6 +162,30 @@ async function updateUserDetailsById(userId, userData) {
     return updatedUser;
 }
 
+// function to delete project by id
+async function deleteProjectById(projectId) {
+    let deletedProject = await project.findByIdAndDelete(projectId);
+    if (!deletedProject) {
+        return null
+    }
+    return deletedProject;
+}
+
+// function to delete task by id
+async function deleteTaskById(taskId) {
+    let deletedTask = await task.findByIdAndDelete(taskId);
+    if (! deletedTask) {
+        return null;
+    }
+    return deletedTask;
+}
+
+// function to delete multiple tasks on the basis of some filter
+async function deleteMultipleTasks(data) {
+    let response = await task.deleteMany(data) ;
+    return response;
+}
+
 // Routes for authentication
 app.post("/signup", signup);
 app.post("/login", login);
@@ -288,6 +312,45 @@ app.post("/user/update/:id", authenticateToken, async (req, res) => {
         res.status(500).json({ error: error.message })
     }
 })
+
+// POST route to delete multiple tasks
+app.post("/tasks/delete/many", authenticateToken, async (req, res) => {
+    let data = req.body;
+    try {
+        let response = await deleteMultipleTasks(data);
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// DELETE route to delete project by id
+app.delete("/project/delete/:id", authenticateToken, async (req, res) => {
+    let projectId = req.params.id;
+    try {
+        let response = await deleteProjectById(projectId);
+        if (response === null) {
+            return res.status(404).json({ message: "Project not found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// DELETE route to delete task by id
+app.delete("/task/delete/:id", authenticateToken, async (req, res) => {
+    let taskId = req.params.id;
+    try {
+        let response = await deleteTaskById(taskId);
+        if (response === null) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // GET Route to fetch all projects of user by token details
 app.get("/projects", authenticateToken, async (req, res) => {
