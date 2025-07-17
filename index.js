@@ -414,7 +414,7 @@ app.get("/tasks", authenticateToken, async (req, res) => {
 
 // GET route to get users on the basis of some data
 app.get("/users/details", authenticateToken, async (req, res) => {
-    let data = req.body;
+    let data = req.query;
     try {
         let response = await getUsersByData(data);
         if (response.length === 0) {
