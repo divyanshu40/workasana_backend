@@ -193,7 +193,24 @@ async function updateMultipleUsers(filter, update) {
 }
 
 // function to fetch tasks on the basis of some filter
-async function filterTasks(filter) {
+async function filterTasks(filterParams) {
+    let { owners, status, tags, projects, teams } = filterParams;
+    let filter = {};
+    if (owners) {
+        filter.owners = owners;
+    }
+    if (status) {
+        filter.status = status;
+    }
+    if (tags) {
+        filter.tags = tags;
+    }
+    if (projects) {
+        filter.projects = projects;
+    }
+    if (teams) {
+        filter.teams = teams;
+    }
     let tasks = await task.find(filter);
     return tasks;
 }
@@ -490,9 +507,9 @@ app.get("/user/details/:id", authenticateToken, async (req, res) => {
 
 // GET route to fetch tasks on the basis of filter criteria
 app.get("/tasks/filter", authenticateToken, async (req, res) => {
-    let filter = req.query;
+    let filterParams = req.query;
     try {
-        let response = await filterTasks(filter);
+        let response = await filterTasks(filterParams);
         if (response.length === 0) {
             return res.status(404).json({ message: "No tasks found" });
         }
