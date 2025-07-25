@@ -192,6 +192,12 @@ async function updateMultipleUsers(filter, update) {
     return response;
 }
 
+// function to fetch tasks on the basis of some filter
+async function filterTasks(filter) {
+    let tasks = await task.find(filter);
+    return tasks;
+}
+
 // Routes for authentication
 app.post("/signup", signup);
 app.post("/login", login);
@@ -475,6 +481,20 @@ app.get("/user/details/:id", authenticateToken, async (req, res) => {
         let response = await getUserDetailsById(userId);
         if (response === null) {
             return res.status(404).json({ message: "User not found"});
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET route to fetch tasks on the basis of filter criteria
+app.get("/tasks/filter", authenticateToken, async (req, res) => {
+    let filter = req.query;
+    try {
+        let response = await filterTasks(filter);
+        if (response.length === 0) {
+            return res.status(404).json({ message: "No tasks found" });
         }
         return res.status(200).json(response);
     } catch(error) {
