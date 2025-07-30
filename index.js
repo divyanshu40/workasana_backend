@@ -224,6 +224,12 @@ async function getUserDetailsByData(data) {
     return userDetails
 }
 
+// function to fetch tasks on the basis of some data
+async function fetchTasksByData(data) {
+    let tasks = await task.find(data);
+    return tasks;
+}
+
 // Routes for authentication
 app.post("/signup", signup);
 app.post("/login", login);
@@ -540,5 +546,19 @@ app.get("/user/data", authenticateToken, async (req, res) => {
         return res.status(200).json(response);
     } catch(error) {
         res.status(500).json({ error: error.message })
+    }
+});
+
+// GET Route to get tasks on the basis of some data
+app.get("/tasks/details", authenticateToken, async (req, res) => {
+    let data = req.query;
+    try {
+        let response = await fetchTasksByData(data);
+        if (response.length === 0) {
+            return res.status(404).json({ message: "Tasks not found" });
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
     }
 });
