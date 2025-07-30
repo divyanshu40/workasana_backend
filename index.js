@@ -215,6 +215,15 @@ async function filterTasks(filterParams, userId) {
     return tasks;
 }
 
+// function to find a user on the basis of some data
+async function getUserDetailsByData(data) {
+    let userDetails = await user.findOne(data);
+    if (! userDetails) {
+        return null;
+    }
+    return userDetails
+}
+
 // Routes for authentication
 app.post("/signup", signup);
 app.post("/login", login);
@@ -517,5 +526,19 @@ app.get("/tasks/filter", authenticateToken, async (req, res) => {
         return res.status(200).json(response);
     } catch(error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// GET route to get user details on the basis of some data
+app.get("/user/data", authenticateToken, async (req, res) => {
+    let data = req.query;
+    try {
+        let response = await getUserDetailsByData(data);
+        if (response === null) {
+            return res.status(404).json({ message: "No user found"});
+        }
+        return res.status(200).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message })
     }
 });
